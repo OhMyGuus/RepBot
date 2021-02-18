@@ -17,7 +17,6 @@ namespace RepBot.lib
         private DiscordServerStore()
         {
             Load();
-           
         }
 
         public DiscordServer GetServer(ulong id)

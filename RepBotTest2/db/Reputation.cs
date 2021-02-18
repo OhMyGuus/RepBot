@@ -30,7 +30,7 @@ namespace RepBot.db
             var reputationHistory = tempRep.Where(o => o.UserId == userId).TakeLast(length).Select(o => $"{o.GetRepAmount()} from {GetUsername(guild, o.UserId)} ::: {o.Reason} ").ToList(); ;
             if (reputationHistory.Count < length)
             {
-                reputationHistory.Add("--- no history to display");
+                reputationHistory.Add("--- end of history");
             }
             return string.Join("\n", reputationHistory);
         }
