@@ -28,8 +28,38 @@ namespace RepBot.Modules
             DiscordServerStore.getInstance().ConfigureServer(Context.Guild.Id, new DiscordServerSettings() { RepTimeout = TimeSpan.FromSeconds(RepTimeOut), MaxRepAmount = maxRepAmount });
             await ReplyAsync("Configured server");
         }
+        [Command("$reset")]
+        public async Task Reset(string userid)
+        {
+            RepUser giverUser = server.GetRepUser(Context.Guild, Context.User.Id);
+            RepUser repUser = GetRepUser(userid);
+            if (repUser == null)
+            {
+                await ReplyAsync("Cannot find user");
+                return;
+            }
+            repUser.ReputationHistory.Clear();
+            DiscordServerStore.getInstance().Save();
+            await ReplyAsync("Users Rep Cleared!");
+        }
+        private RepUser GetRepUser(string userId = null)
+        {
+            var userMention = Context.Message.MentionedUsers.FirstOrDefault();
+            if (userMention != null)
+            {
+                return server.GetRepUser(Context.Guild, userMention.Id);
+            }
+            else
+            {
+                if (ulong.TryParse(userId, out ulong parsedId) && (Context.Guild.GetUser(parsedId) != null || server.GetRepUserOrNull(parsedId) != null))
+                {
+                    return server.GetRepUser(Context.Guild, parsedId);
+                }
+            }
+            return null;
+        }
 
-      
+
 
     }
 }

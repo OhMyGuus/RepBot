@@ -79,16 +79,17 @@ namespace RepBot.Modules
                 await ReplyAsync($"You need to wait {repTimeout.GetHumanReadable()}");
                 return;
             }
+            if (repUser.GetCurrentRep() >= server.Settings.MaxRepAmount)
+            {
+                await ReplyAsync($"User already has met his reputation limit");
+                return;
+            }
 
             var reputation = repUser.AddReputation(Context.Message.Id, giverUser, goodRep, reason);
             giverUser.LatestRepTime = DateTime.UtcNow;
             DiscordServerStore.getInstance().Save();
             var repCount = repUser.GetCurrentRep();
-            if (repCount >= server.Settings.MaxRepAmount)
-            {
-                await ReplyAsync($"User already has met his reputation limit");
-                return;
-            }
+            
             /// requested vars
             var repUserInfo = repUser.GetUserInfo(Context.Guild);
             var giverUserInfo = giverUser.GetUserInfo(Context.Guild);
