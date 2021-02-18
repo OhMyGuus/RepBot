@@ -101,7 +101,7 @@ namespace RepBot.Modules
             builder.AddField(":star2: Total", $"```diff\n{repCount.ToString("+0;-#")}```", true);
             builder.AddField(":pencil2: Note", $"```{reason}```", true);
             builder.AddField("Recent Reputation :page_facing_up:", $"```diff\n{repUser.GetReputationHistory(Context.Guild, server, 5)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username}`");
-            builder.WithFooter($"Requested by {giverUserInfo.UsernameFull} | {repUserInfo.UsernameFull} ({repUser.DiscordUserId})", giverUserInfo.AvatarUrl);
+            builder.WithFooter($"given by {giverUserInfo.UsernameFull} | RepId: {repUser.DiscordUserId} {reputation.RepId}", giverUserInfo.AvatarUrl);
             await ReplyAsync(embed: builder.Build());
 
             _logger.LogInformation($"{Context.User.Username} executed the ping command!");

@@ -42,6 +42,27 @@ namespace RepBot.Modules
             DiscordServerStore.getInstance().Save();
             await ReplyAsync("Users Rep Cleared!");
         }
+        [Command("$remove")]
+        public async Task Remove(string userid, ulong RepID, string reason)
+        {
+            RepUser giverUser = server.GetRepUser(Context.Guild, Context.User.Id);
+            RepUser repUser = GetRepUser(userid);
+            if (repUser == null)
+            {
+                await ReplyAsync("Cannot find user");
+                return;
+            }
+            var reputation = repUser.ReputationHistory.Find(o => o.RepId == RepID);
+            if (reputation == null)
+            {
+                await ReplyAsync("Reputation not found");
+                return;
+            }
+            reputation.RepAmount = 0;
+            reputation.Reason = $"removed by {giverUser.GetUserInfo(Context.Guild).UsernameFull}";
+            DiscordServerStore.getInstance().Save();
+            await ReplyAsync("Users Rep Cleared!");
+        }
         private RepUser GetRepUser(string userId = null)
         {
             var userMention = Context.Message.MentionedUsers.FirstOrDefault();
