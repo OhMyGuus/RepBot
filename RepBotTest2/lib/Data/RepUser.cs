@@ -72,7 +72,7 @@ namespace RepBot.lib
         {
             if(ReputationHistory.Find(o => o.UserId == giverUser.DiscordUserId && goodRep == goodRep) != null)
             {
-                throw new Exception("You gave this person already reputation");
+        //        throw new Exception("You gave this person already reputation");
             }
             var rep = new Reputation(RepId, giverUser.DiscordUserId, goodRep, reason, giverUser.GetWeight());
             ReputationHistory.Add(rep);

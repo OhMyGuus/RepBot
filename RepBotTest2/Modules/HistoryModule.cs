@@ -36,7 +36,7 @@ namespace RepBot.Modules
         }
 
         [Command("$history")]
-        public async Task History(string userId = null)
+        public async Task History(string userId = null, string amount = null)
         {
             RepUser repUser = GetRepUser(userId ?? Context.User.Id.ToString());
             if (repUser == null)
@@ -44,10 +44,31 @@ namespace RepBot.Modules
                 await ReplyAsync("Cannot find user");
                 return;
             }
-            await GetHistory(repUser);
+            await GetHistory(repUser, amount == "full" ? 20 : 10);
         }
 
-        public async Task GetHistory(RepUser repUser)
+        public async Task GetHistory(RepUser repUser, int amount = 10)
+        {
+            var requestUser = Context.User;
+            var repCount = repUser.GetCurrentRep();
+            bool goodRep = repCount >= 0;
+
+            /// requested vars
+            var repUserInfo = repUser.GetUserInfo(Context.Guild);
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.WithColor(goodRep ? Color.Green : Color.Red);
+           // builder.WithThumbnailUrl(repUser.GetAvatarUrl(Context.Guild));
+            builder.AddField($":page_facing_up: Reputation history for {repUserInfo.NickName}", $"```diff\n{repUser.GetReputationHistory(Context.Guild, server, amount)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`");
+            builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
+            builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(lib.Data.RepType.Positive).ToString("+0;-#")}```", true);
+            builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(lib.Data.RepType.Negative).ToString("+0;-#")}```", true);
+
+
+            builder.WithFooter($"Requested by {requestUser.Username}#{requestUser.Discriminator} | {repUserInfo.UsernameFull} ({repUser.DiscordUserId})", requestUser.GetAvatarUrl());
+            await ReplyAsync(embed: builder.Build());
+            _logger.LogInformation($"{Context.User.Username} executed the ping command!");
+        }
+        public async Task GetHistoryFull(RepUser repUser, int amount = 10)
         {
             var requestUser = Context.User;
             var repCount = repUser.GetCurrentRep();
@@ -58,7 +79,7 @@ namespace RepBot.Modules
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(goodRep ? Color.Green : Color.Red);
             builder.WithThumbnailUrl(repUser.GetAvatarUrl(Context.Guild));
-            builder.AddField($":page_facing_up: Reputation history for {repUserInfo.NickName}", $"```diff\n{repUser.GetReputationHistory(Context.Guild, server, 10)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username}`");
+            builder.AddField($":page_facing_up: Reputation history for {repUserInfo.NickName}", $"```diff\n{repUser.GetReputationHistory(Context.Guild, server, amount)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`");
             builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
             builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(lib.Data.RepType.Positive).ToString("+0;-#")}```", true);
             builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(lib.Data.RepType.Negative).ToString("+0;-#")}```", true);
@@ -68,6 +89,7 @@ namespace RepBot.Modules
             await ReplyAsync(embed: builder.Build());
             _logger.LogInformation($"{Context.User.Username} executed the ping command!");
         }
+
 
 
     }
