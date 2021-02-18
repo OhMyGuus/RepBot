@@ -4,39 +4,29 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
-using RepBot.db;
 using RepBot.lib;
 using RepBot.lib.Data;
 
 namespace RepBot.Modules
 {
-    public class HistoryModule : ModuleBase<SocketCommandContext>
+    public class HistoryModule : BotModuleBase
     {
-        private readonly ILogger<ReputationModule> _logger;
+        public HistoryModule(ILogger<ReputationModule> logger) : base(logger) { }
 
-        public HistoryModule(ILogger<ReputationModule> logger)
-            => _logger = logger;
-
-        private DiscordServer server => DiscordServerStore.getInstance().GetServer(Context.Guild.Id);
-        private RepUser GetRepUser(string userId = null)
+        [Command("$me")]
+        public async Task MyHistory()
         {
-            var userMention = Context.Message.MentionedUsers.FirstOrDefault();
-            if (userMention != null)
+            RepUser repUser = GetRepUser(Context.User.Id.ToString());
+            if (repUser == null)
             {
-                return server.GetRepUser(Context.Guild, userMention.Id);
+                await ReplyAsync("Cannot find user");
+                return;
             }
-            else
-            {
-                if (ulong.TryParse(userId, out ulong parsedId) && (Context.Guild.GetUser(parsedId) != null || server.GetRepUserOrNull(parsedId) != null))
-                {
-                    return server.GetRepUser(Context.Guild, parsedId);
-                }
-            }
-            return null;
+            await HistorySmall(repUser);
         }
 
         [Command("$history")]
-        public async Task History(string userId = null, string amount = null)
+        public async Task History(string userId = null, string mode = null)
         {
             RepUser repUser = GetRepUser(userId ?? Context.User.Id.ToString());
             if (repUser == null)
@@ -44,7 +34,14 @@ namespace RepBot.Modules
                 await ReplyAsync("Cannot find user");
                 return;
             }
-            await GetHistory(repUser, amount == "full" ? 20 : 10);
+            if(mode == "full")
+            {
+                await GetHistory(repUser, 20);
+            }
+            else
+            {
+                await HistorySmall(repUser);
+            }
         }
 
         public async Task GetHistory(RepUser repUser, int amount = 10)
@@ -57,18 +54,19 @@ namespace RepBot.Modules
             var repUserInfo = repUser.GetUserInfo(Context.Guild);
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(goodRep ? Color.Green : Color.Red);
-           // builder.WithThumbnailUrl(repUser.GetAvatarUrl(Context.Guild));
-            builder.AddField($":page_facing_up: Reputation history for {repUserInfo.NickName}", $"```diff\n{repUser.GetReputationHistory(Context.Guild, server, amount)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`");
+            // builder.WithThumbnailUrl(repUser.GetAvatarUrl(Context.Guild));
+            builder.AddField($":page_facing_up: Reputation history for {repUserInfo.NickName}", $"```diff\n{repUser.GetReputationHistory(Context.Guild, amount)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`");
             builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
-            builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(lib.Data.RepType.Positive).ToString("+0;-#")}```", true);
-            builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(lib.Data.RepType.Negative).ToString("+0;-#")}```", true);
+            builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Positive).ToString("+0;-#")}```", true);
+            builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Negative).ToString("+0;-#")}```", true);
 
 
             builder.WithFooter($"Requested by {requestUser.Username}#{requestUser.Discriminator} | {repUserInfo.UsernameFull} ({repUser.DiscordUserId})", requestUser.GetAvatarUrl());
             await ReplyAsync(embed: builder.Build());
-            _logger.LogInformation($"{Context.User.Username} executed the ping command!");
+            await repUser.UpdateHardCleared(Context.Guild);
         }
-        public async Task GetHistoryFull(RepUser repUser, int amount = 10)
+
+        public async Task HistorySmall(RepUser repUser)
         {
             var requestUser = Context.User;
             var repCount = repUser.GetCurrentRep();
@@ -79,15 +77,20 @@ namespace RepBot.Modules
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(goodRep ? Color.Green : Color.Red);
             builder.WithThumbnailUrl(repUser.GetAvatarUrl(Context.Guild));
-            builder.AddField($":page_facing_up: Reputation history for {repUserInfo.NickName}", $"```diff\n{repUser.GetReputationHistory(Context.Guild, server, amount)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`");
-            builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
-            builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(lib.Data.RepType.Positive).ToString("+0;-#")}```", true);
-            builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(lib.Data.RepType.Negative).ToString("+0;-#")}```", true);
+            builder.WithTitle($"{repUserInfo.NickName}'s Reputation Summary");
+            builder.AddField(":star2: Reputation", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")} ({repUser.GetCurrentRep(RepType.Positive)}:{repUser.GetCurrentRep(RepType.Negative)})```", true);
+            builder.AddField(":trophy: Hard Clear", repUser.HardClear? "```diff\nUnlocked :)```" : $"```diff\n{repUser.GetCurrentRep()}/{server.Settings.HardClearAmount}```", true);
+            builder.AddField(":scales: Weight", $"```diff\n{ repUser.GetWeight()}```", true);
 
+
+            builder.AddField($"Recent Reputation :page_facing_up:", $"```diff\n{repUser.GetReputationHistory(Context.Guild, 10)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`");
+            builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
+            builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Positive).ToString("+0;-#")}```", true);
+            builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Negative).ToString("+0;-#")}```", true);
 
             builder.WithFooter($"Requested by {requestUser.Username}#{requestUser.Discriminator} | {repUserInfo.UsernameFull} ({repUser.DiscordUserId})", requestUser.GetAvatarUrl());
             await ReplyAsync(embed: builder.Build());
-            _logger.LogInformation($"{Context.User.Username} executed the ping command!");
+            await repUser.UpdateHardCleared(Context.Guild);
         }
 
 

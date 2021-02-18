@@ -1,37 +1,45 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
-using RepBot.db;
 using RepBot.lib;
 using RepBot.lib.Data;
 
 namespace RepBot.Modules
 {
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
-    public class AdminModule : ModuleBase<SocketCommandContext>
+    public class AdminModule : BotModuleBase
     {
-        private readonly ILogger<ReputationModule> _logger;
+        public AdminModule(ILogger<ReputationModule> logger) : base(logger) { }
 
-        public AdminModule(ILogger<ReputationModule> logger)
-            => _logger = logger;
-
-        private DiscordServer server => DiscordServerStore.getInstance().GetServer(Context.Guild.Id);
-      
 
         [Command("=configure")]
-        public async Task Configure(int RepTimeOut, int maxRepAmount = 20)
+        public async Task Configure(int RepTimeOut, string logChannel, string repChannel, string hardclearRole, int maxRepAmount = 20, int hardClearAmount = 20)
         {
-            DiscordServerStore.getInstance().ConfigureServer(Context.Guild.Id, new DiscordServerSettings() { RepTimeout = TimeSpan.FromSeconds(RepTimeOut), MaxRepAmount = maxRepAmount });
+            ulong logchannelId = Context.Message.MentionedChannels.FirstOrDefault().Id;
+            ulong repChannelId = Context.Message.MentionedChannels.ToArray()[1].Id;
+            ulong hardclearRoleId = Context.Message.MentionedRoles.FirstOrDefault().Id;
+            DiscordServerStore.getInstance().ConfigureServer(Context.Guild.Id, new DiscordServerSettings()
+            {
+                RepTimeout = TimeSpan.FromSeconds(RepTimeOut),
+                MaxRepAmount = maxRepAmount,
+                LogChannelId = logchannelId,
+                HardClearRoleId = hardclearRoleId,
+                RepChannelID = repChannelId,
+                HardClearAmount = hardClearAmount
+            });
             await ReplyAsync("Configured server");
         }
+
+
         [Command("$reset")]
         public async Task Reset(string userid)
         {
-            RepUser giverUser = server.GetRepUser(Context.Guild, Context.User.Id);
+            RepUser myUser = server.GetRepUser(Context.Guild, Context.User.Id);
             RepUser repUser = GetRepUser(userid);
             if (repUser == null)
             {
@@ -42,10 +50,12 @@ namespace RepBot.Modules
             DiscordServerStore.getInstance().Save();
             await ReplyAsync("Users Rep Cleared!");
         }
-        [Command("$remove")]
-        public async Task Remove(string userid, ulong RepID, string reason)
+
+        [Command("$delete")]
+        public async Task Delete(string userid, ulong RepID, [Remainder] string reason = null)
         {
-            RepUser giverUser = server.GetRepUser(Context.Guild, Context.User.Id);
+            RepUser myUser = server.GetRepUser(Context.Guild, Context.User.Id);
+            var myUserInfo = myUser.GetUserInfo(Context.Guild);
             RepUser repUser = GetRepUser(userid);
             if (repUser == null)
             {
@@ -58,29 +68,19 @@ namespace RepBot.Modules
                 await ReplyAsync("Reputation not found");
                 return;
             }
-            reputation.RepAmount = 0;
-            reputation.Reason = $"removed by {giverUser.GetUserInfo(Context.Guild).UsernameFull}";
+            string historyString = reputation.ToHistoryString(server, Context.Guild);
+            reputation.Delete(myUser);
             DiscordServerStore.getInstance().Save();
-            await ReplyAsync("Users Rep Cleared!");
-        }
-        private RepUser GetRepUser(string userId = null)
-        {
-            var userMention = Context.Message.MentionedUsers.FirstOrDefault();
-            if (userMention != null)
-            {
-                return server.GetRepUser(Context.Guild, userMention.Id);
-            }
-            else
-            {
-                if (ulong.TryParse(userId, out ulong parsedId) && (Context.Guild.GetUser(parsedId) != null || server.GetRepUserOrNull(parsedId) != null))
-                {
-                    return server.GetRepUser(Context.Guild, parsedId);
-                }
-            }
-            return null;
-        }
 
-
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"{myUserInfo.UsernameFull} **removed** reputation: ");
+            sb.Append($"```diff\n{historyString}```");
+            if (!string.IsNullOrEmpty(reason))
+            {
+                sb.Append($"with the reason: ```{reason}```");
+            }
+            await Log(sb.ToString());
+        }
 
     }
 }

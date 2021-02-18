@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,7 +19,7 @@ namespace RepBot.lib.Data
         }
         public DiscordServer(){ }
 
-        public RepUser GetRepUser(Discord.WebSocket.SocketGuild guild, ulong userId)
+        public RepUser GetRepUser(IGuild guild, ulong userId)
         {
             if (!RepUsers.ContainsKey(userId))
             {

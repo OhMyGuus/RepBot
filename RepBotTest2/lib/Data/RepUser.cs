@@ -1,42 +1,26 @@
-﻿using RepBot.lib.Data;
+﻿using Discord;
+using RepBot.lib.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RepBot.lib
 {
-    public struct RepUserInfo
-    {
-        public string Mention { get; set; }
-        public string UsernameFull => $"{Username}#{Discriminator}";
-        public string Username { get; set; }
-        public string Discriminator { get; set; }
-        public string NickName { get; set; }
-        public string AvatarUrl { get; internal set; }
-
-        internal static RepUserInfo GetInfo(Discord.WebSocket.SocketGuildUser user)
-        {
-            return new RepUserInfo()
-            {
-                Mention = user.Mention,
-                Username = user.Username,
-                Discriminator = user.Discriminator,
-                NickName = user.Nickname ?? user.Username,
-                AvatarUrl = user.GetAvatarUrl()
-            };
-        }
-    }
 
     public class RepUser
     {
         public ulong DiscordUserId { get; set; }
+        public ulong DiscordServerId { get; set; }
         public List<Reputation> ReputationHistory { get; set; } = new List<Reputation>();
         public DateTime? LatestRepTime { get; set; } = null;
-        public RepUserInfo? RepUserInfoCache { get; set; }
-
-        public RepUser(Discord.WebSocket.SocketGuild guild, ulong discordUserId)
+        public RepUserInfo RepUserInfoCache { get; set; }
+        protected DiscordServer server => DiscordServerStore.getInstance().GetServer(DiscordServerId);
+        public bool HardClear { get; set; }
+        public RepUser(IGuild guild, ulong discordUserId)
         {
             DiscordUserId = discordUserId;
+            DiscordServerId = guild.Id;
             RepUserInfoCache = GetUserInfo(guild);
         }
         public RepUser() { } // empty ctor for json
@@ -51,14 +35,14 @@ namespace RepBot.lib
         {
             return serverTimeOut - (DateTime.UtcNow - LatestRepTime) ?? TimeSpan.FromSeconds(0);
         }
-        public RepUserInfo GetUserInfo(Discord.WebSocket.SocketGuild guild)
+        public RepUserInfo GetUserInfo(IGuild guild)
         {
-            var user = guild.GetUser(DiscordUserId);
+            var user = guild.GetUserAsync(DiscordUserId).Result;
             if (user == null)
             {
                 if (RepUserInfoCache != null)
                 {
-                    return RepUserInfoCache.Value;
+                    return RepUserInfoCache;
                 }
                 throw new Exception("User not found");
             }
@@ -68,30 +52,61 @@ namespace RepBot.lib
             return info;
         }
 
-        public Reputation AddReputation(ulong RepId, RepUser giverUser, bool goodRep, string reason)
+        public Reputation AddReputation(ulong RepId, RepUser myUser, bool goodRep, string reason)
         {
-            if(ReputationHistory.Find(o => o.UserId == giverUser.DiscordUserId && goodRep == goodRep) != null)
+            if (ReputationHistory.Find(o => o.UserId == myUser.DiscordUserId) != null)
             {
-        //        throw new Exception("You gave this person already reputation");
+                throw new Exception("You gave this person already reputation");
             }
-            var rep = new Reputation(RepId, giverUser.DiscordUserId, goodRep, reason, giverUser.GetWeight());
+            var rep = new Reputation(RepId, myUser.DiscordUserId, goodRep, reason, myUser.GetWeight());
             ReputationHistory.Add(rep);
             return rep;
         }
 
-        private int GetWeight()
+        public int GetWeight()
         {
-            return 1;
+            return HardClear ? 2 : 1;
+        }
+        public async Task UpdateHardCleared(IGuild guild)
+        {
+            var discordUser = await guild.GetUserAsync(DiscordUserId);
+            if (discordUser == null)
+            {
+                return;
+            }
+            if (GetCurrentRep() >= server.Settings.HardClearAmount)
+            {
+                if (!discordUser.RoleIds.Contains(server.Settings.HardClearRoleId) || !HardClear)
+                {
+                    HardClear = true;
+                    await discordUser.AddRoleAsync(guild.GetRole(server.Settings.HardClearRoleId));
+                    DiscordServerStore.getInstance().Save();
+                    var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
+                    channel?.SendMessageAsync($":trophy: {RepUserInfoCache.Mention} | has been given the Hard Clear role. (they have met the requirement of {server.Settings.MaxRepAmount} rep)");
+
+                }
+            }
+            else
+            {
+                if (discordUser.RoleIds.Contains(server.Settings.HardClearRoleId) || HardClear)
+                {
+                    HardClear = false;
+                    await discordUser.RemoveRoleAsync(guild.GetRole(server.Settings.HardClearRoleId));
+                    DiscordServerStore.getInstance().Save();
+                    var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
+                    channel?.SendMessageAsync($":no_entry_sign: {RepUserInfoCache.Mention} had Hard Clear revoked. (they have fallen below the requirement of {server.Settings.MaxRepAmount} rep)");
+                }
+            }
         }
 
-        public string GetAvatarUrl(Discord.WebSocket.SocketGuild guild)
+        public string GetAvatarUrl(IGuild guild)
         {
-            var user = guild.GetUser(DiscordUserId);
+            var user = guild.GetUserAsync(DiscordUserId).Result;
             return user == null ? "https://i.imgur.com/R7mqXKL.png" : user.GetAvatarUrl();
         }
-        public string GetReputationHistory(Discord.WebSocket.SocketGuild guild, DiscordServer server, int length = 5)
+        public string GetReputationHistory(IGuild guild, int length = 5)
         {
-            var reputationHistory = ReputationHistory.TakeLast(length).OrderByDescending(o => o.RepId).Select(o => $"{o.GetRepAmount()} from {server.GetRepUser(guild, o.UserId).GetUserInfo(guild).UsernameFull} ::: {o.Reason} ").ToList(); ;
+            var reputationHistory = ReputationHistory.TakeLast(length).OrderByDescending(o => o.RepId).Select(o => o.ToHistoryString(server, guild)).ToList(); ;
             if (ReputationHistory.Count < length)
             {
                 reputationHistory.Add("--- no history to display");
