@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -81,6 +82,13 @@ namespace RepBot.Modules
             }
             await Log(sb.ToString());
         }
+
+        [Command("=backup")]
+        public async Task Backup()
+        {
+            await Context.Channel.SendFileAsync(new MemoryStream(Encoding.Default.GetBytes(DiscordServerStore.getInstance().ToJson())), "data.json");
+        }
+
 
     }
 }

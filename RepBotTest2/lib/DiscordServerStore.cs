@@ -45,9 +45,14 @@ namespace RepBot.lib
         }
 
         #region loading & sigelton
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(DiscordServers);
+        }
         public void Save()
         {
-            File.WriteAllText(DATAFILENAME, JsonConvert.SerializeObject(DiscordServers));
+            File.WriteAllText(DATAFILENAME, ToJson());
         }
 
         private void Load()
