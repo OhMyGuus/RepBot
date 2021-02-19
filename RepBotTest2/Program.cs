@@ -24,7 +24,8 @@ namespace RepBot
                         .SetBasePath(Directory.GetCurrentDirectory())
                         .AddJsonFile("appsettings.json", false, true)
                         .Build();
-
+                    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISCORD_TOKEN")))
+                        configuration["token"] = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
                     x.AddConfiguration(configuration);
                 })
                 .ConfigureLogging(x =>
