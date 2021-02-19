@@ -163,6 +163,12 @@ namespace RepBot.Modules
                 return false;
             }
 
+            if (repUser.ReputationHistory.Find(o => o.UserId == myUser.DiscordUserId && o.GoodRep == goodRep && !o.Removed) != null)
+            {
+                await ReplyAsync("You gave this person already reputation");
+                return false;
+            }
+
             return true;
         }
 

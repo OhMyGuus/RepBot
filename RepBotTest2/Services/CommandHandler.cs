@@ -46,7 +46,15 @@ namespace RepBot.Services
 
         private async Task OnCommandExecuted(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
-            if (command.IsSpecified && !result.IsSuccess) await context.Channel.SendMessageAsync($"Error: {result}");
+            if (command.IsSpecified && !result.IsSuccess)
+            {
+
+                if (result.Error == CommandError.UnmetPrecondition)
+                {
+                    return;
+                }
+                await context.Channel.SendMessageAsync($"Error: {result}");
+            }
         }
     }
 }

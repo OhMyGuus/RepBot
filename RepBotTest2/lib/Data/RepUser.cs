@@ -54,10 +54,6 @@ namespace RepBot.lib
 
         public Reputation AddReputation(ulong RepId, RepUser myUser, bool goodRep, string reason)
         {
-            if (ReputationHistory.Find(o => o.UserId == myUser.DiscordUserId) != null)
-            {
-                throw new Exception("You gave this person already reputation");
-            }
             var rep = new Reputation(RepId, myUser.DiscordUserId, goodRep, reason, myUser.GetWeight());
             ReputationHistory.Add(rep);
             return rep;

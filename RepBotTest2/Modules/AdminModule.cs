@@ -73,7 +73,7 @@ namespace RepBot.Modules
             DiscordServerStore.getInstance().Save();
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"{myUserInfo.UsernameFull} **removed** reputation: ");
+            sb.AppendLine($"{myUserInfo.UsernameFull} **removed** reputation from {repUser.RepUserInfoCache.UsernameFull}: ");
             sb.Append($"```diff\n{historyString}```");
             if (!string.IsNullOrEmpty(reason))
             {
