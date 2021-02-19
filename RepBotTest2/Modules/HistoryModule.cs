@@ -61,7 +61,7 @@ namespace RepBot.Modules
             builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Negative).ToString("+0;-#")}```", true);
 
 
-            builder.WithFooter($"Requested by {requestUser.Username}#{requestUser.Discriminator} | {repUserInfo.UsernameFull} ({repUser.DiscordUserId})", requestUser.GetAvatarUrl());
+            builder.WithFooter($"Requested by {requestUser.Username}#{requestUser.Discriminator} | {repUserInfo.UsernameFull} ({repUser.DiscordUserId})", repUserInfo.AvatarUrl);
             await ReplyAsync(embed: builder.Build());
             await repUser.UpdateHardCleared(Context.Guild);
         }

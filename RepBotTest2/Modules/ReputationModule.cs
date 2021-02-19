@@ -157,7 +157,7 @@ namespace RepBot.Modules
                 return false;
             }
 
-            if (myUser.DiscordUserId == myUser.DiscordUserId)
+            if (myUser.DiscordUserId == repUser.DiscordUserId)
             {
                 await ReplyAsync($"Nice try buddy..");
                 return false;
