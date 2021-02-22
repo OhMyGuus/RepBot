@@ -55,7 +55,7 @@ namespace RepBot.Modules
         [Command("$help")]
         public async Task Help()
         {
-            await ReplyAsync($"");
+            await ReplyAsync($"I don't need help do u? (still in progress)");
         }
 
     }
