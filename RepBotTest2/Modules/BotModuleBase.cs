@@ -15,9 +15,9 @@ namespace RepBot.Modules
         protected readonly ILogger<ReputationModule> _logger;
         protected DiscordServer server => DiscordServerStore.getInstance().GetServer(Context.Guild.Id);
 
-        protected RepUser GetRepUser(string userId = null)
+        protected RepUser GetRepUser(string userId = null, int index = 0)
         {
-            var userMention = Context.Message.MentionedUsers.FirstOrDefault();
+            var userMention = Context.Message.MentionedUsers.Skip(index).FirstOrDefault();
             if (userMention != null)
             {
                 return server.GetRepUser(Context.Guild, userMention.Id);
@@ -38,7 +38,7 @@ namespace RepBot.Modules
             {
                 if (server.Settings.LogChannelId != 0)
                 {
-                
+
                     await Context.Guild.GetTextChannel(server.Settings.LogChannelId)?.SendMessageAsync("\r\n **:notepad_spiral: RepLogs | **" + log);
                 }
             }

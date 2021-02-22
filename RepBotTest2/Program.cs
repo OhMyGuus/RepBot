@@ -53,6 +53,7 @@ namespace RepBot
                 .ConfigureServices((context, services) =>
                 {
                     services.AddHostedService<CommandHandler>();
+                    services.AddHostedService<VoiceChannelHandler>();
                 })
                 .UseConsoleLifetime();
             

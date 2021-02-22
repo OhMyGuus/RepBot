@@ -27,7 +27,7 @@ namespace RepBot.lib
             Removed = true;
             UserId = myUser.DiscordUserId;
             RepAmount = 0;
-            Reason = $"removed by {myUser.RepUserInfoCache.UsernameFull}";
+            Reason = $"removed by {myUser.InfoCache.UsernameFull}";
         }
 
         public string ToHistoryString(DiscordServer server, IGuild guild)

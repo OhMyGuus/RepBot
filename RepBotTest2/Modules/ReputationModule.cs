@@ -16,22 +16,7 @@ namespace RepBot.Modules
     public class ReputationModule : BotModuleBase
     {
         public ReputationModule(ILogger<ReputationModule> logger) : base(logger) { }
-
-        [Command("$time")]
-        public async Task Time()
-        {
-            RepUser myUser = server.GetRepUser(Context.Guild, Context.User.Id);
-            TimeSpan repTimeout = myUser.GetRepTimeout(server.Settings.RepTimeout);
-            if (repTimeout.TotalSeconds > 0)
-            {
-                await ReplyAsync($":stopwatch: You need to wait {repTimeout.GetHumanReadable()}");
-            }
-            else
-            {
-                await ReplyAsync($":salad: Whohoo you can give someone rep again!");
-            }
-        }
-
+           
         [Command("+rep")]
         public async Task PlusRep(string userid = "-1", [Remainder] string reason = "")
         {
@@ -157,7 +142,7 @@ namespace RepBot.Modules
             }
             if (reason.Length < 5 || reason.Length > 100)
             {
-                await ReplyAsync($"{myUser.RepUserInfoCache.Mention}, :x: Reason must be between 5 and 100 characters");
+                await ReplyAsync($"{myUser.InfoCache.Mention}, :x: Reason must be between 5 and 100 characters");
                 return false;
             }
             if (repUser.GetCurrentRep() >= server.Settings.MaxRepAmount && goodRep)
@@ -190,8 +175,8 @@ namespace RepBot.Modules
         public async Task LogRep(RepUser myUser, RepUser repUser, Reputation rep)
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine($"{myUser.RepUserInfoCache.Mention} gave {rep.GetRepAmount()} to {repUser.RepUserInfoCache.Mention}");
-            builder.Append($"```diff\n{rep.GetRepAmount()} [{rep.RepId}] {myUser.RepUserInfoCache.UsernameFull} \"{rep.Reason}\"```");
+            builder.AppendLine($"{myUser.InfoCache.Mention} gave {rep.GetRepAmount()} to {repUser.InfoCache.Mention}");
+            builder.Append($"```diff\n{rep.GetRepAmount()} [{rep.RepId}] {myUser.InfoCache.UsernameFull} \"{rep.Reason}\"```");
             builder.AppendLine($"*Remove this with* `$delete {repUser.DiscordUserId} {rep.RepId} [optional reason]`");
             await Log(builder.ToString());
         }

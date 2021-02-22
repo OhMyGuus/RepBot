@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using RepBot.lib.Data;
 using System;
 using System.Collections.Generic;
@@ -14,14 +15,16 @@ namespace RepBot.lib
         public ulong DiscordServerId { get; set; }
         public List<Reputation> ReputationHistory { get; set; } = new List<Reputation>();
         public DateTime? LatestRepTime { get; set; } = null;
-        public RepUserInfo RepUserInfoCache { get; set; }
+        public RepUserInfo InfoCache { get; set; }
+        public Dictionary<ulong, ulong> GameTimeWithPlayer { get; set; } = new Dictionary<ulong, ulong>();
+
         protected DiscordServer server => DiscordServerStore.getInstance().GetServer(DiscordServerId);
         public bool HardClear { get; set; } = false;
         public RepUser(IGuild guild, ulong discordUserId)
         {
             DiscordUserId = discordUserId;
             DiscordServerId = guild.Id;
-            RepUserInfoCache = GetUserInfo(guild);
+            InfoCache = GetUserInfo(guild);
         }
         public RepUser() { } // empty ctor for json
         public int GetCurrentRep(RepType type = RepType.Total)
@@ -40,15 +43,15 @@ namespace RepBot.lib
             var user = guild.GetUserAsync(DiscordUserId, mode: CacheMode.AllowDownload, options: new RequestOptions() { RetryMode = RetryMode.AlwaysRetry }).Result;
             if (user == null)
             {
-                if (RepUserInfoCache != null)
+                if (InfoCache != null)
                 {
-                    return RepUserInfoCache;
+                    return InfoCache;
                 }
                 throw new Exception($"User not found in {guild.Name}");
             }
 
             RepUserInfo info = RepUserInfo.GetInfo(user);
-            RepUserInfoCache = info;
+            InfoCache = info;
             return info;
         }
 
@@ -58,6 +61,8 @@ namespace RepBot.lib
             ReputationHistory.Add(rep);
             return rep;
         }
+
+
 
         public int GetWeight()
         {
@@ -79,7 +84,7 @@ namespace RepBot.lib
                     await discordUser.AddRoleAsync(guild.GetRole(server.Settings.HardClearRoleId));
                     DiscordServerStore.getInstance().Save();
                     var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
-                    channel?.SendMessageAsync($":trophy: {RepUserInfoCache.Mention} | has been given the Hard Clear role. (they have met the requirement of {server.Settings.HardClearAmount} rep)");
+                    channel?.SendMessageAsync($":trophy: {InfoCache.Mention} | has been given the Hard Clear role. (they have met the requirement of {server.Settings.HardClearAmount} rep)");
                     await discordUser.SendMessageAsync($":trophy: **You have been given Hard Clear!** You have met the reputation requirement of {server.Settings.HardClearAmount}, congrats! Understand that this may be revoked at any time if you recieve enough negative reputation.)");
                 }
             }
@@ -91,7 +96,7 @@ namespace RepBot.lib
                     await discordUser.RemoveRoleAsync(guild.GetRole(server.Settings.HardClearRoleId));
                     DiscordServerStore.getInstance().Save();
                     var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
-                    channel?.SendMessageAsync($":no_entry_sign: {RepUserInfoCache.Mention} had Hard Clear revoked. (they have fallen below the requirement of {server.Settings.HardClearAmount} rep)");
+                    channel?.SendMessageAsync($":no_entry_sign: {InfoCache.Mention} had Hard Clear revoked. (they have fallen below the requirement of {server.Settings.HardClearAmount} rep)");
                     await discordUser.SendMessageAsync($":no_entry_sign: **Frick your Hard Clear is gone**");
 
                 }
@@ -114,6 +119,22 @@ namespace RepBot.lib
             return string.Join("\n", reputationHistory);
         }
 
+        internal void AddPlayTime(IGuildUser user, ulong time)
+        {
+            if (GameTimeWithPlayer.ContainsKey(user.Id))
+            {
+                GameTimeWithPlayer[user.Id] += time;
+            }
+            else
+            {
+                GameTimeWithPlayer.Add(user.Id, time);
+            }
+        }
+
+        public TimeSpan GetPlayTime(ulong userId)
+        {
+            return TimeSpan.FromSeconds(GameTimeWithPlayer.ContainsKey(userId) ? GameTimeWithPlayer[userId] : 0);
+        }
 
     }
 }

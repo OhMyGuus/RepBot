@@ -95,16 +95,5 @@ namespace RepBot.Modules
             await ReplyAsync(embed: builder.Build());
             await repUser.UpdateHardCleared(Context.Guild);
         }
-
-
-        [Command("$help")]
-        public async Task Help()
-        {
-            await ReplyAsync($"");
-        }
-
-
-
-
     }
 }

@@ -74,7 +74,7 @@ namespace RepBot.Modules
             DiscordServerStore.getInstance().Save();
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"{myUserInfo.UsernameFull} **removed** reputation from {repUser.RepUserInfoCache.UsernameFull}: ");
+            sb.AppendLine($"{myUserInfo.UsernameFull} **removed** reputation from {repUser.InfoCache.UsernameFull}: ");
             sb.Append($"```diff\n{historyString}```");
             if (!string.IsNullOrEmpty(reason))
             {
@@ -110,5 +110,7 @@ namespace RepBot.Modules
 
             await ReplyAsync($"Pong! -> :stopwatch: Message response latency: {ping} -> Discord api latency: {Context.Client.Latency} ");
         }
+
+     
     }
 }
