@@ -16,7 +16,7 @@ namespace RepBot.lib
         public DateTime? LatestRepTime { get; set; } = null;
         public RepUserInfo RepUserInfoCache { get; set; }
         protected DiscordServer server => DiscordServerStore.getInstance().GetServer(DiscordServerId);
-        public bool HardClear { get; set; }
+        public bool HardClear { get; set; } = false;
         public RepUser(IGuild guild, ulong discordUserId)
         {
             DiscordUserId = discordUserId;
@@ -78,7 +78,7 @@ namespace RepBot.lib
                     await discordUser.AddRoleAsync(guild.GetRole(server.Settings.HardClearRoleId));
                     DiscordServerStore.getInstance().Save();
                     var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
-                    channel?.SendMessageAsync($":trophy: {RepUserInfoCache.Mention} | has been given the Hard Clear role. (they have met the requirement of {server.Settings.MaxRepAmount} rep)");
+                    channel?.SendMessageAsync($":trophy: {RepUserInfoCache.Mention} | has been given the Hard Clear role. (they have met the requirement of {server.Settings.HardClearAmount} rep)");
 
                 }
             }
@@ -90,7 +90,7 @@ namespace RepBot.lib
                     await discordUser.RemoveRoleAsync(guild.GetRole(server.Settings.HardClearRoleId));
                     DiscordServerStore.getInstance().Save();
                     var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
-                    channel?.SendMessageAsync($":no_entry_sign: {RepUserInfoCache.Mention} had Hard Clear revoked. (they have fallen below the requirement of {server.Settings.MaxRepAmount} rep)");
+                    channel?.SendMessageAsync($":no_entry_sign: {RepUserInfoCache.Mention} had Hard Clear revoked. (they have fallen below the requirement of {server.Settings.HardClearAmount} rep)");
                 }
             }
         }
