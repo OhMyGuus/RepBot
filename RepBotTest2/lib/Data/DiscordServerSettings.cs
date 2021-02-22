@@ -10,5 +10,6 @@ namespace RepBot.lib.Data
         public ulong LogChannelId { get;  set; }
         public int HardClearAmount { get; set; } = 10;
         public ulong HardClearRoleId { get;  set; }
+        public ulong AdminRoleId { get;  set; }
     }
 }

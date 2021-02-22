@@ -52,12 +52,12 @@ namespace RepBot.lib
         }
         public void Save()
         {
-            File.WriteAllText(DATAFILENAME, ToJson());
+            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + DATAFILENAME, ToJson());
         }
 
         private void Load()
         {
-            if (File.Exists(DATAFILENAME))
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + DATAFILENAME))
             {
                 string data = File.ReadAllText(DATAFILENAME);
                 DiscordServers = JsonConvert.DeserializeObject<Dictionary<ulong, DiscordServer>>(data);

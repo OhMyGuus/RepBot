@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Discord;
@@ -22,7 +23,7 @@ namespace RepBot
                 {
                     var configuration = new ConfigurationBuilder()
                         .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", false, true)
+                        .AddJsonFile(AppDomain.CurrentDomain.BaseDirectory + "appsettings.json", false, true)
                         .Build();
                     if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISCORD_TOKEN")))
                         configuration["token"] = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
@@ -56,7 +57,7 @@ namespace RepBot
                     services.AddHostedService<VoiceChannelHandler>();
                 })
                 .UseConsoleLifetime();
-            
+
             var host = builder.Build();
             using (host)
             {

@@ -19,11 +19,13 @@ namespace RepBot.Modules
 
 
         [Command("=configure")]
-        public async Task Configure(int RepTimeOut, string logChannel, string repChannel, string hardclearRole, int maxRepAmount = 20, int hardClearAmount = 20)
+        public async Task Configure(int RepTimeOut, string logChannel, string repChannel, string hardclearRole, string adminRole, int maxRepAmount = 20, int hardClearAmount = 20)
         {
-            ulong logchannelId = Context.Message.MentionedChannels.FirstOrDefault().Id;
-            ulong repChannelId = Context.Message.MentionedChannels.ToArray()[1].Id;
-            ulong hardclearRoleId = Context.Message.MentionedRoles.FirstOrDefault().Id;
+            ulong logchannelId = Context.Message.MentionedChannels.Skip(0).FirstOrDefault().Id;
+            ulong repChannelId = Context.Message.MentionedChannels.Skip(1).FirstOrDefault().Id;
+            ulong hardclearRoleId = Context.Message.MentionedRoles.Skip(0).FirstOrDefault().Id;
+            ulong adminRoleId = Context.Message.MentionedRoles.Skip(1).FirstOrDefault().Id;
+
             DiscordServerStore.getInstance().ConfigureServer(Context.Guild.Id, new DiscordServerSettings()
             {
                 RepTimeout = TimeSpan.FromSeconds(RepTimeOut),
@@ -31,7 +33,8 @@ namespace RepBot.Modules
                 LogChannelId = logchannelId,
                 HardClearRoleId = hardclearRoleId,
                 RepChannelID = repChannelId,
-                HardClearAmount = hardClearAmount
+                HardClearAmount = hardClearAmount,
+                AdminRoleId = adminRoleId
             });
             await ReplyAsync("Configured server");
         }
@@ -119,6 +122,6 @@ namespace RepBot.Modules
             await ReplyAsync($"Pong! -> :stopwatch: Message response latency: {ping} -> Discord api latency: {Context.Client.Latency} ");
         }
 
-     
+
     }
 }

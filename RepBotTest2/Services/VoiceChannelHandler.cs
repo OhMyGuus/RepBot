@@ -32,9 +32,10 @@ namespace RepBot.Services
             }
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             running = false;
+            return Task.CompletedTask;
         }
 
         private async Task VoiceHandlerLoop(CancellationToken cancellationToken)
@@ -59,7 +60,7 @@ namespace RepBot.Services
                                     var repuser = server.GetRepUser(guild, otherUser.Id);
                                     repuser.AddPlayTime(user, 60);
                                 }
-                                catch (Exception e) { }
+                                catch { }
                             }
                         }
                     }

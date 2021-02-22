@@ -135,7 +135,8 @@ namespace RepBot.Modules
         public async Task<bool> CanGiveRep(RepUser myUser, RepUser repUser, bool goodRep, string reason)
         {
             TimeSpan repTimeout = myUser.GetRepTimeout(server.Settings.RepTimeout);
-            if (repTimeout.TotalSeconds > 0)
+            bool isAdmin = !((IGuildUser)Context.Message.Author) .RoleIds.Any(o => o == server.Settings.AdminRoleId);
+            if (repTimeout.TotalSeconds > 0 && !isAdmin)
             {
                 await ReplyAsync($"You need to wait {repTimeout.GetHumanReadable()}");
                 return false;
@@ -151,7 +152,7 @@ namespace RepBot.Modules
                 return false;
             }
 
-            if (Context.Channel.Id != server.Settings.RepChannelID)
+            if (Context.Channel.Id != server.Settings.RepChannelID || !isAdmin)
             {
                 await ReplyAsync($"This is not the right channel");
                 return false;
@@ -163,7 +164,7 @@ namespace RepBot.Modules
                 return false;
             }
 
-            if (repUser.ReputationHistory.Find(o => o.UserId == myUser.DiscordUserId && o.GoodRep == goodRep && !o.Removed) != null)
+            if (repUser.ReputationHistory.Find(o => o.UserId == myUser.DiscordUserId && o.GoodRep == goodRep && !o.Removed) != null || isAdmin)
             {
                 await ReplyAsync("You gave this person already reputation");
                 return false;
