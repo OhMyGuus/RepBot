@@ -39,7 +39,7 @@ namespace RepBot.Modules
                 return;
             }
 
-            await ReplyAsync($"{repUser.InfoCache.Mention} and {repUser2.InfoCache.Mention} played in total {repUser.GetPlayTime(repUser2.DiscordUserId).GetHumanReadable()} together.");
+            await ReplyAsync($":stopwatch:{repUser.InfoCache.Mention} and {repUser2.InfoCache.Mention} played in total {repUser.GetPlayTime(repUser2.DiscordUserId).GetHumanReadable()} together.");
         }
 
         [Command("$help")]
