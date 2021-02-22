@@ -28,6 +28,10 @@ namespace RepBot.Modules
         [Command("$history")]
         public async Task History(string userId = null, string mode = null)
         {
+            if(userId == "me")
+            {
+                userId = null; //ugly but fine
+            }
             RepUser repUser = GetRepUser(userId ?? Context.User.Id.ToString());
             if (repUser == null)
             {
@@ -83,14 +87,22 @@ namespace RepBot.Modules
             builder.AddField(":scales: Weight", $"```diff\n{ repUser.GetWeight()}```", true);
 
             builder.AddField($"Recent Reputation :page_facing_up:", $"```diff\n{repUser.GetReputationHistory(Context.Guild, 10)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`");
-            builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
-            builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Positive).ToString("+0;-#")}```", true);
-            builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Negative).ToString("+0;-#")}```", true);
+            //builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
+            //builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Positive).ToString("+0;-#")}```", true);
+            //builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Negative).ToString("+0;-#")}```", true);
 
             builder.WithFooter($"Requested by {requestUser.Username}#{requestUser.Discriminator} | {repUserInfo.UsernameFull} ({repUser.DiscordUserId})", requestUser.GetAvatarUrl());
             await ReplyAsync(embed: builder.Build());
             await repUser.UpdateHardCleared(Context.Guild);
         }
+
+
+        [Command("$help")]
+        public async Task Help()
+        {
+            await ReplyAsync($"");
+        }
+
 
 
 

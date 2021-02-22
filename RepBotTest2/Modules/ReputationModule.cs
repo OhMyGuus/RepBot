@@ -17,6 +17,21 @@ namespace RepBot.Modules
     {
         public ReputationModule(ILogger<ReputationModule> logger) : base(logger) { }
 
+        [Command("$time")]
+        public async Task Time()
+        {
+            RepUser myUser = server.GetRepUser(Context.Guild, Context.User.Id);
+            TimeSpan repTimeout = myUser.GetRepTimeout(server.Settings.RepTimeout);
+            if (repTimeout.TotalSeconds > 0)
+            {
+                await ReplyAsync($":stopwatch: You need to wait {repTimeout.GetHumanReadable()}");
+            }
+            else
+            {
+                await ReplyAsync($":salad: Whohoo you can give someone rep again!");
+            }
+        }
+
         [Command("+rep")]
         public async Task PlusRep(string userid = "-1", [Remainder] string reason = "")
         {
@@ -47,7 +62,7 @@ namespace RepBot.Modules
 
         public async Task GiveRep(RepUser myUser, RepUser repUser, bool goodRep, string reason)
         {
-            if (!await CanGiveRep(myUser,repUser,goodRep, reason))
+            if (!await CanGiveRep(myUser, repUser, goodRep, reason))
             {
                 return;
             }
@@ -140,7 +155,7 @@ namespace RepBot.Modules
                 await ReplyAsync($"You need to wait {repTimeout.GetHumanReadable()}");
                 return false;
             }
-            if(reason.Length < 5 || reason.Length > 100)
+            if (reason.Length < 5 || reason.Length > 100)
             {
                 await ReplyAsync($"{myUser.RepUserInfoCache.Mention}, :x: Reason must be between 5 and 100 characters");
                 return false;

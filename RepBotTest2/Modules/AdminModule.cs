@@ -106,7 +106,9 @@ namespace RepBot.Modules
         [Command("=ping")]
         public async Task Ping()
         {
-            await ReplyAsync($"Pong! -> :stopwatch: Message response latency: {(Context.Message.CreatedAt.UtcDateTime - DateTimeOffset.Now.UtcDateTime).TotalSeconds} -> Discord api latency: {Context.Client.Latency} ");
+            var ping = (Context.Message.Timestamp.UtcDateTime - DateTimeOffset.UtcNow.UtcDateTime).TotalMilliseconds + " ms";
+
+            await ReplyAsync($"Pong! -> :stopwatch: Message response latency: {ping} -> Discord api latency: {Context.Client.Latency} ");
         }
     }
 }
