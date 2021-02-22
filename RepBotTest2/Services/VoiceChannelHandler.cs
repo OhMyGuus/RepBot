@@ -41,7 +41,7 @@ namespace RepBot.Services
         {
             while (!cancellationToken.IsCancellationRequested && running)
             {
-                await Task.Delay((int)TimeSpan.FromSeconds(60).TotalMilliseconds);
+                await Task.Delay(60000);
                 foreach (var server in DiscordServerStore.getInstance().DiscordServers.Values)
                 {
                     var guild = _client.GetGuild(server.DiscordServerID);
@@ -62,7 +62,6 @@ namespace RepBot.Services
                             }
                         }
                     }
-                    await Task.Delay(60000);
                 }
             }
 
