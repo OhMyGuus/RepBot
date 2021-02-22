@@ -46,7 +46,7 @@ namespace RepBot.Services
                 foreach (var server in DiscordServerStore.getInstance().DiscordServers.Values)
                 {
                     var guild = _client.GetGuild(server.DiscordServerID);
-                    var voiceChannels = guild.VoiceChannels;//.Where(o => o.Users.Count >= 2);
+                    var voiceChannels = guild.VoiceChannels.Where(o => o.Users.Count >= 3);
                     foreach (var channel in voiceChannels)
                     {
                         foreach (var user in channel.Users)
