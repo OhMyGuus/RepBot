@@ -103,5 +103,10 @@ namespace RepBot.Modules
             await ReplyAsync("Done..");
         }
 
+        [Command("=ping")]
+        public async Task Ping()
+        {
+            await ReplyAsync($"Pong! -> Message response latency: {(Context.Message.CreatedAt - DateTimeOffset.Now).TotalSeconds} -> Discord api latency: {Context.Client.Latency} ");
+        }
     }
 }
