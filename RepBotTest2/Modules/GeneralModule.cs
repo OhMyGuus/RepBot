@@ -46,10 +46,10 @@ namespace RepBot.Modules
             }
             if (playtime.TotalSeconds == 0)
             {
-                await ReplyAsync($":sweat_smile: No record of {repUser.InfoCache.Mention} and {repUser2.InfoCache.Mention} playing together");
+                await ReplyAsync($":sweat_smile: No record of **{repUser.InfoCache.NickName}** and **{repUser2.InfoCache.NickName}** playing together");
                 return;
             }
-            await ReplyAsync($":stopwatch:{repUser.InfoCache.Mention} and {repUser2.InfoCache.Mention} played in total {playtime.GetHumanReadable()} together.");
+            await ReplyAsync($":stopwatch:**{repUser.InfoCache.NickName}** and **{repUser2.InfoCache.NickName}** played in total {playtime.GetHumanReadable()} together.");
         }
 
         [Command("$help")]
