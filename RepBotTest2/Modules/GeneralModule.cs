@@ -19,7 +19,7 @@ namespace RepBot.Modules
             TimeSpan repTimeout = myUser.GetRepTimeout(server.Settings.RepTimeout);
             if (repTimeout.TotalSeconds > 0)
             {
-                await ReplyAsync($":stopwatch: You need to wait {repTimeout.GetHumanReadable()}, maybe time to get some :cookie::milk:"); //
+                await ReplyAsync($":stopwatch: You need to wait {repTimeout.GetHumanReadable()}");//, maybe time to get some :cookie::milk:"); //
             }
             else
             {
