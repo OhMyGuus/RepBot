@@ -152,7 +152,7 @@ namespace RepBot.Modules
                 return false;
             }
 
-            if (Context.Channel.Id != server.Settings.RepChannelID || !isAdmin)
+            if (Context.Channel.Id != server.Settings.RepChannelID && !isAdmin)
             {
                 await ReplyAsync($"This is not the right channel");
                 return false;
@@ -164,7 +164,7 @@ namespace RepBot.Modules
                 return false;
             }
 
-            if (repUser.ReputationHistory.Find(o => o.UserId == myUser.DiscordUserId && o.GoodRep == goodRep && !o.Removed) != null || isAdmin)
+            if (repUser.ReputationHistory.Find(o => o.UserId == myUser.DiscordUserId && o.GoodRep == goodRep && !o.Removed) != null && !isAdmin)
             {
                 await ReplyAsync("You gave this person already reputation");
                 return false;
