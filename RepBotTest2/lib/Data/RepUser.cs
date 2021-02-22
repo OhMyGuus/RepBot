@@ -80,7 +80,7 @@ namespace RepBot.lib
                     DiscordServerStore.getInstance().Save();
                     var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
                     channel?.SendMessageAsync($":trophy: {RepUserInfoCache.Mention} | has been given the Hard Clear role. (they have met the requirement of {server.Settings.HardClearAmount} rep)");
-
+                    await discordUser.SendMessageAsync($":trophy: **You have been given Hard Clear!** You have met the reputation requirement of {server.Settings.HardClearAmount}, congrats! Understand that this may be revoked at any time if you recieve enough negative reputation.)");
                 }
             }
             else
@@ -92,6 +92,8 @@ namespace RepBot.lib
                     DiscordServerStore.getInstance().Save();
                     var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
                     channel?.SendMessageAsync($":no_entry_sign: {RepUserInfoCache.Mention} had Hard Clear revoked. (they have fallen below the requirement of {server.Settings.HardClearAmount} rep)");
+                    await discordUser.SendMessageAsync($":no_entry_sign: **Frick your Hard Clear is gone**");
+
                 }
                 HardClear = false;
             }

@@ -89,6 +89,20 @@ namespace RepBot.Modules
             await Context.Channel.SendFileAsync(new MemoryStream(Encoding.Default.GetBytes(DiscordServerStore.getInstance().ToJson())), "data.json");
         }
 
+        [Command("=cleanup")]
+        public async Task CleanUp()
+        {
+            var role = Context.Guild.GetRole(server.Settings.HardClearRoleId);
+            await ReplyAsync($"U have 60 seconds to stop the bot before its done... removing  from{role.Name} with: {role.Members.Count()} member ");
+            await Task.Delay(60000);
+            foreach (var member in role.Members)
+            {
+                await member.RemoveRoleAsync(role);
+                await ReplyAsync($":no_entry_sign: removed role from: {member.Username}");
+            }
+            await ReplyAsync("Done..");
+        }
+
 
     }
 }
