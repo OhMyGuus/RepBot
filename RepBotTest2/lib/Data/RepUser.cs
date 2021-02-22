@@ -17,7 +17,6 @@ namespace RepBot.lib
         public DateTime? LatestRepTime { get; set; } = null;
         public RepUserInfo InfoCache { get; set; }
         public Dictionary<ulong, ulong> GameTimeWithPlayer { get; set; } = new Dictionary<ulong, ulong>();
-
         protected DiscordServer server => DiscordServerStore.getInstance().GetServer(DiscordServerId);
         public bool HardClear { get; set; } = false;
         public RepUser(IGuild guild, ulong discordUserId)
@@ -121,6 +120,10 @@ namespace RepBot.lib
 
         internal void AddPlayTime(IGuildUser user, ulong time)
         {
+            if (GameTimeWithPlayer == null)
+            {
+                GameTimeWithPlayer = new Dictionary<ulong, ulong>();
+            }
             if (GameTimeWithPlayer.ContainsKey(user.Id))
             {
                 GameTimeWithPlayer[user.Id] += time;
@@ -133,6 +136,11 @@ namespace RepBot.lib
 
         public TimeSpan GetPlayTime(ulong userId)
         {
+            if(GameTimeWithPlayer == null)
+            {
+                GameTimeWithPlayer = new Dictionary<ulong, ulong>();
+                return TimeSpan.FromSeconds(0);
+            }
             return TimeSpan.FromSeconds(GameTimeWithPlayer.ContainsKey(userId) ? GameTimeWithPlayer[userId] : 0);
         }
 

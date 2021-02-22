@@ -9,8 +9,10 @@ namespace RepBot.Modules
             string timeString;
             if (timeElapsed.Hours > 0)
                 timeString = timeElapsed.Hours.ToString() + " hour(s), " + timeElapsed.Minutes.ToString() + " minutes, " + timeElapsed.Seconds.ToString() + " seconds";
-            else if (timeElapsed.Minutes > 0)
+            else if (timeElapsed.Minutes > 0 && timeElapsed.Seconds > 0)
                 timeString = timeElapsed.Minutes.ToString() + " minutes, " + timeElapsed.Seconds.ToString() + " seconds";
+            else if (timeElapsed.Minutes > 0 && timeElapsed.Seconds == 0)
+                timeString = timeElapsed.Minutes.ToString() + " minutes";
             else
                 timeString = timeElapsed.Seconds.ToString() + " seconds";
             return timeString;

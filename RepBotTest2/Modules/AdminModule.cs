@@ -103,6 +103,14 @@ namespace RepBot.Modules
             await ReplyAsync("Done..");
         }
 
+        [Command("=save")]
+        public async Task Save()
+        {
+            DiscordServerStore.getInstance().Save();
+            await ReplyAsync($"Made sure evreything was saved correctly");
+        }
+
+
         [Command("=ping")]
         public async Task Ping()
         {

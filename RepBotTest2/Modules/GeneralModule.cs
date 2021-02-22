@@ -19,7 +19,7 @@ namespace RepBot.Modules
             TimeSpan repTimeout = myUser.GetRepTimeout(server.Settings.RepTimeout);
             if (repTimeout.TotalSeconds > 0)
             {
-                await ReplyAsync($":stopwatch: You need to wait {repTimeout.GetHumanReadable()}, maybe time to get some milk:chocolate_bar: :milk: ");
+                await ReplyAsync($":stopwatch: You need to wait {repTimeout.GetHumanReadable()}, maybe time to get some :cookie::milk:"); //
             }
             else
             {
@@ -31,15 +31,25 @@ namespace RepBot.Modules
         public async Task Playtime(string userId1 = "", string userId2 = "")
         {
             RepUser repUser = string.IsNullOrEmpty(userId2) ? server.GetRepUser(Context.Guild, Context.User.Id) : GetRepUser(userId1, 0);
-            RepUser repUser2 = string.IsNullOrEmpty(userId2) ? GetRepUser(userId1, 0) : GetRepUser(userId2, 1);
+            RepUser repUser2 = string.IsNullOrEmpty(userId2) ? (string.IsNullOrEmpty(userId1) ? repUser : GetRepUser(userId1, 0)) : GetRepUser(userId2, 1);
 
-            if (repUser == null)
+            if (repUser == null || repUser2 == null)
             {
                 await ReplyAsync("Cannot find user");
                 return;
             }
-
-            await ReplyAsync($":stopwatch:{repUser.InfoCache.Mention} and {repUser2.InfoCache.Mention} played in total {repUser.GetPlayTime(repUser2.DiscordUserId).GetHumanReadable()} together.");
+            var playtime = repUser.GetPlayTime(repUser2.DiscordUserId);
+            if(repUser.DiscordUserId == repUser2.DiscordUserId)
+            {
+                await ReplyAsync($":cold_sweat:You played in total {playtime.GetHumanReadable()} ");
+                return;
+            }
+            if (playtime.TotalSeconds == 0)
+            {
+                await ReplyAsync($":sweat_smile: No record of {repUser.InfoCache.Mention} and {repUser2.InfoCache.Mention} playing together");
+                return;
+            }
+            await ReplyAsync($":stopwatch:{repUser.InfoCache.Mention} and {repUser2.InfoCache.Mention} played in total {playtime.GetHumanReadable()} together.");
         }
 
         [Command("$help")]

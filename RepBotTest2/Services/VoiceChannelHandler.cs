@@ -39,18 +39,19 @@ namespace RepBot.Services
 
         private async Task VoiceHandlerLoop(CancellationToken cancellationToken)
         {
+            int saveTime = 0;
             while (!cancellationToken.IsCancellationRequested && running)
             {
                 await Task.Delay(60000);
                 foreach (var server in DiscordServerStore.getInstance().DiscordServers.Values)
                 {
                     var guild = _client.GetGuild(server.DiscordServerID);
-                    var voiceChannels = guild.VoiceChannels.Where(o => o.Users.Count >= 2);
+                    var voiceChannels = guild.VoiceChannels;//.Where(o => o.Users.Count >= 2);
                     foreach (var channel in voiceChannels)
                     {
                         foreach (var user in channel.Users)
                         {
-                            var otherUsers = channel.Users.Where(o => o.Id != user.Id);
+                            var otherUsers = channel.Users;//.Where(o => o.Id != user.Id);
                             foreach (var otherUser in otherUsers)
                             {
                                 try
@@ -62,6 +63,12 @@ namespace RepBot.Services
                             }
                         }
                     }
+                  
+                }
+                if (saveTime++ == 10)
+                {
+                    saveTime = 0;
+                    DiscordServerStore.getInstance().Save();
                 }
             }
 
