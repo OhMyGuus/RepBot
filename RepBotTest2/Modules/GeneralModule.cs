@@ -28,7 +28,7 @@ namespace RepBot.Modules
         }
 
         [Command("$playtime")]
-        public async Task Playtime(string userId1, string userId2)
+        public async Task Playtime(string userId1 = "", string userId2 = "")
         {
             RepUser repUser = string.IsNullOrEmpty(userId2) ? server.GetRepUser(Context.Guild, Context.User.Id) : GetRepUser(userId1, 0);
             RepUser repUser2 = string.IsNullOrEmpty(userId2) ? GetRepUser(userId1, 0) : GetRepUser(userId2, 1);
@@ -39,7 +39,7 @@ namespace RepBot.Modules
                 return;
             }
 
-            await ReplyAsync($":boom:Player {repUser.InfoCache.UsernameFull} and {repUser2.InfoCache.UsernameFull} played in total {repUser.GetPlayTime(repUser2.DiscordUserId).GetHumanReadable()}");
+            await ReplyAsync($"{repUser.InfoCache.Mention} and {repUser2.InfoCache.Mention} played in total {repUser.GetPlayTime(repUser2.DiscordUserId).GetHumanReadable()} together.");
         }
 
         [Command("$help")]
