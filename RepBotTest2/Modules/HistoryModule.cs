@@ -40,7 +40,7 @@ namespace RepBot.Modules
             }
             if(mode == "full")
             {
-                await GetHistory(repUser, 20);
+                await GetHistory(repUser, 10);
             }
             else
             {
@@ -63,7 +63,6 @@ namespace RepBot.Modules
             builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
             builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Positive).ToString("+0;-#")}```", true);
             builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Negative).ToString("+0;-#")}```", true);
-
 
             builder.WithFooter($"Requested by {requestUser.Username}#{requestUser.Discriminator} | {repUserInfo.UsernameFull} ({repUser.DiscordUserId})", repUserInfo.AvatarUrl);
             await ReplyAsync(embed: builder.Build());
