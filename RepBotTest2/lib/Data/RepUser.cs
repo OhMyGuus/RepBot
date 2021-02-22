@@ -63,6 +63,7 @@ namespace RepBot.lib
         {
             return HardClear ? 2 : 1;
         }
+
         public async Task UpdateHardCleared(IGuild guild)
         {
             var discordUser = await guild.GetUserAsync(DiscordUserId);
@@ -92,6 +93,7 @@ namespace RepBot.lib
                     var channel = await guild.GetTextChannelAsync(server.Settings.RepChannelID);
                     channel?.SendMessageAsync($":no_entry_sign: {RepUserInfoCache.Mention} had Hard Clear revoked. (they have fallen below the requirement of {server.Settings.HardClearAmount} rep)");
                 }
+                HardClear = false;
             }
         }
 
