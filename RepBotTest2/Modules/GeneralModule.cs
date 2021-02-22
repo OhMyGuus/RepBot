@@ -41,7 +41,7 @@ namespace RepBot.Modules
             var playtime = repUser.GetPlayTime(repUser2.DiscordUserId);
             if(repUser.DiscordUserId == repUser2.DiscordUserId)
             {
-                await ReplyAsync($":cold_sweat:You played in total {playtime.GetHumanReadable()} ");
+                await ReplyAsync($":alarm_clock:You played in total {playtime.GetHumanReadable()} ");
                 return;
             }
             if (playtime.TotalSeconds == 0)
