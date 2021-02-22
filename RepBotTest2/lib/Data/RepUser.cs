@@ -37,14 +37,14 @@ namespace RepBot.lib
         }
         public RepUserInfo GetUserInfo(IGuild guild)
         {
-            var user = guild.GetUserAsync(DiscordUserId).Result;
+            var user = guild.GetUserAsync(DiscordUserId, mode: CacheMode.AllowDownload, options: new RequestOptions() { RetryMode = RetryMode.AlwaysRetry }).Result;
             if (user == null)
             {
                 if (RepUserInfoCache != null)
                 {
                     return RepUserInfoCache;
                 }
-                throw new Exception("User not found");
+                throw new Exception($"User not found in {guild.Name}");
             }
 
             RepUserInfo info = RepUserInfo.GetInfo(user);

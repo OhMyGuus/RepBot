@@ -24,7 +24,7 @@ namespace RepBot.Modules
             }
             else
             {
-                if (ulong.TryParse(userId, out ulong parsedId) && (Context.Guild.GetUser(parsedId) != null || server.GetRepUserOrNull(parsedId) != null))
+                if (userId != "-1" && ulong.TryParse(userId, out ulong parsedId) && (Context.Guild.GetUser(parsedId) != null || server.GetRepUserOrNull(parsedId) != null))
                 {
                     return server.GetRepUser(Context.Guild, parsedId);
                 }

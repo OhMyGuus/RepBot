@@ -172,12 +172,12 @@ namespace RepBot.Modules
             return true;
         }
 
-        public async Task LogRep(RepUser user, RepUser user2, Reputation rep)
+        public async Task LogRep(RepUser myUser, RepUser repUser, Reputation rep)
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine($"{user.RepUserInfoCache.Mention} gave {rep.GetRepAmount()} to {user.RepUserInfoCache.Mention}");
-            builder.Append($"```diff\n{rep.GetRepAmount()} [{rep.RepId}] {user.RepUserInfoCache.UsernameFull} \"{rep.Reason}\"```");
-            builder.AppendLine($"*Remove this with* `$delete {user2.DiscordUserId} {rep.RepId} [optional reason]`");
+            builder.AppendLine($"{myUser.RepUserInfoCache.Mention} gave {rep.GetRepAmount()} to {repUser.RepUserInfoCache.Mention}");
+            builder.Append($"```diff\n{rep.GetRepAmount()} [{rep.RepId}] {myUser.RepUserInfoCache.UsernameFull} \"{rep.Reason}\"```");
+            builder.AppendLine($"*Remove this with* `$delete {repUser.DiscordUserId} {rep.RepId} [optional reason]`");
             await Log(builder.ToString());
         }
 

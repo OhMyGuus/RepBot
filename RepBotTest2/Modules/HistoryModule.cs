@@ -82,7 +82,6 @@ namespace RepBot.Modules
             builder.AddField(":trophy: Hard Clear", repUser.HardClear? "```diff\nUnlocked :)```" : $"```diff\n{repUser.GetCurrentRep()}/{server.Settings.HardClearAmount}```", true);
             builder.AddField(":scales: Weight", $"```diff\n{ repUser.GetWeight()}```", true);
 
-
             builder.AddField($"Recent Reputation :page_facing_up:", $"```diff\n{repUser.GetReputationHistory(Context.Guild, 10)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`");
             builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
             builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Positive).ToString("+0;-#")}```", true);
