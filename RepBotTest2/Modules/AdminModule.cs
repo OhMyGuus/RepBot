@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,14 @@ namespace RepBot.Modules
                 AdminRoleId = adminRoleId
             });
             await ReplyAsync("Configured server");
+        }
+
+        [Command("=update")]
+        public async Task Update()
+        {
+            Process.Start("/update.sh");
+            await ReplyAsync("Started update service");
+        
         }
 
 
