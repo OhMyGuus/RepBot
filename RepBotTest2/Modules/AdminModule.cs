@@ -139,7 +139,7 @@ namespace RepBot.Modules
             };
             process.Start();
 
-            await ReplyAsync("Started update service1");
+            await ReplyAsync("Started update service4");
         }
 
 
