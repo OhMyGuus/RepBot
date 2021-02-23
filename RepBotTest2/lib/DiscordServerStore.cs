@@ -13,7 +13,7 @@ namespace RepBot.lib
         private static DiscordServerStore Instance = null;
 
         public Dictionary<ulong, DiscordServer> DiscordServers { get; set; } = new Dictionary<ulong, DiscordServer>();
-        const string DATAFILENAME = "data.json";
+        private string DATAFILENAME => AppDomain.CurrentDomain.BaseDirectory + "data.json";
         private DiscordServerStore()
         {
             Load();
@@ -52,12 +52,12 @@ namespace RepBot.lib
         }
         public void Save()
         {
-            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + DATAFILENAME, ToJson());
+            File.WriteAllText(DATAFILENAME, ToJson());
         }
 
         private void Load()
         {
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + DATAFILENAME))
+            if (File.Exists(DATAFILENAME))
             {
                 string data = File.ReadAllText(DATAFILENAME);
                 DiscordServers = JsonConvert.DeserializeObject<Dictionary<ulong, DiscordServer>>(data);

@@ -135,7 +135,7 @@ namespace RepBot.Modules
         public async Task<bool> CanGiveRep(RepUser myUser, RepUser repUser, bool goodRep, string reason)
         {
             TimeSpan repTimeout = myUser.GetRepTimeout(server.Settings.RepTimeout);
-            bool isAdmin = !((IGuildUser)Context.Message.Author) .RoleIds.Any(o => o == server.Settings.AdminRoleId);
+            bool isAdmin = ((IGuildUser)Context.Message.Author) .RoleIds.Any(o => o == server.Settings.AdminRoleId);
             if (repTimeout.TotalSeconds > 0 && !isAdmin)
             {
                 await ReplyAsync($"You need to wait {repTimeout.GetHumanReadable()}");
