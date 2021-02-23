@@ -40,7 +40,7 @@ namespace RepBot.Modules
             }
             if(mode == "full")
             {
-                await GetHistory(repUser, 10);
+                await GetHistory(repUser, 15);
             }
             else
             {
@@ -59,7 +59,9 @@ namespace RepBot.Modules
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(goodRep ? Color.Green : Color.Red);
             // builder.WithThumbnailUrl(repUser.GetAvatarUrl(Context.Guild));
-            builder.AddField($":page_facing_up: Reputation history for {repUserInfo.NickName}", $"```diff\n{repUser.GetReputationHistory(Context.Guild, amount)}``` To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`".WithMaxLength(1023));
+            var repCommand = $"To view {repUserInfo.Username}'s reputation history, use `$history @{repUserInfo.Username} full`";
+            builder.AddField($":page_facing_up: Reputation history for {repUserInfo.NickName}", 
+            $"```diff\n{repUser.GetReputationHistory(Context.Guild, amount).WithMaxLength(1011 - repCommand.Length)}``` {repCommand}");
             builder.AddField(":star2: Total Rep", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")}```", true);
             builder.AddField(":thumbsup: Positive Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Positive).ToString("+0;-#")}```", true);
             builder.AddField(":thumbsdown: Negative Rep", $"```diff\n{ repUser.GetCurrentRep(RepType.Negative).ToString("+0;-#")}```", true);
