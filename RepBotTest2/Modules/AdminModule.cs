@@ -132,7 +132,7 @@ namespace RepBot.Modules
                 {
                     FileName = "sudo",
                     Arguments = "/updatebot.sh",
-                    UseShellExecute = false,
+                    UseShellExecute = true,
                     CreateNoWindow = true,
                     ErrorDialog = false,
                 }

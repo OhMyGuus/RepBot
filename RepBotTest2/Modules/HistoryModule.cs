@@ -82,7 +82,7 @@ namespace RepBot.Modules
             EmbedBuilder builder = new EmbedBuilder();
             builder.WithColor(goodRep ? Color.Green : Color.Red);
             builder.WithThumbnailUrl(repUser.GetAvatarUrl(Context.Guild));
-            builder.WithTitle($"{repUserInfo.NickName}'s Reputation Summary1");
+            builder.WithTitle($"{repUserInfo.NickName}'s Reputation Summary");
             builder.AddField(":star2: Reputation", $"```diff\n{ repUser.GetCurrentRep().ToString("+0;-#")} ({repUser.GetCurrentRep(RepType.Positive)}:{repUser.GetCurrentRep(RepType.Negative)})```", true);
             builder.AddField(":trophy: Hard Clear", repUser.HardClear? "```diff\nUnlocked :)```" : $"```diff\n{repUser.GetCurrentRep()}/{server.Settings.HardClearAmount}```", true);
             builder.AddField(":scales: Weight", $"```diff\n{ repUser.GetWeight()}```", true);
