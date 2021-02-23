@@ -131,7 +131,7 @@ namespace RepBot.Modules
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "sudo",
-                    Arguments = "/updatebot.sh",
+                    Arguments = "nohup /updatebot.sh  &",
                     UseShellExecute = true,
                     CreateNoWindow = true,
                     ErrorDialog = false,
