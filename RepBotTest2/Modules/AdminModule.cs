@@ -43,15 +43,9 @@ namespace RepBot.Modules
         [Command("=update")]
         public async Task Update()
         {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "/update.sh",
-                    UseShellExecute = true,
-                }
-            };
-            process.Start();
+            ProcessStartInfo info = new ProcessStartInfo("sudo", "/update.sh");
+            Process.Start(info);
+
 
             await ReplyAsync("Started update service");
 
