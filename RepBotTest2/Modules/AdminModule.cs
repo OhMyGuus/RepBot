@@ -130,7 +130,7 @@ namespace RepBot.Modules
             info.UseShellExecute = true;
 
             Process.Start(info);
-            await ReplyAsync("Started update service");
+            await ReplyAsync("Started update service1");
         }
 
 
