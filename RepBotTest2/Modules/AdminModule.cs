@@ -40,18 +40,6 @@ namespace RepBot.Modules
             await ReplyAsync("Configured server");
         }
 
-        [Command("=update")]
-        public async Task Update()
-        {
-            ProcessStartInfo info = new ProcessStartInfo("sudo", "/update.sh");
-            Process.Start(info);
-
-
-            await ReplyAsync("Started update service");
-
-        }
-
-
         [Command("$reset")]
         public async Task Reset(string userid)
         {
@@ -132,6 +120,14 @@ namespace RepBot.Modules
             var ping = (Context.Message.Timestamp.UtcDateTime - DateTimeOffset.UtcNow.UtcDateTime).TotalMilliseconds + " ms";
 
             await ReplyAsync($"Pong! -> :stopwatch: Message response latency: {ping} -> Discord api latency: {Context.Client.Latency} ");
+        }
+
+
+        [Command("=update")]
+        public async Task Update()
+        {
+            Process.Start("/updatebot.sh");
+            await ReplyAsync("Started update service");
         }
 
 
