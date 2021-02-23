@@ -127,6 +127,8 @@ namespace RepBot.Modules
         public async Task Update()
         {
             ProcessStartInfo info = new ProcessStartInfo("sudo", "/updatebot.sh");
+            info.UseShellExecute = true;
+
             Process.Start(info);
             await ReplyAsync("Started update service");
         }
