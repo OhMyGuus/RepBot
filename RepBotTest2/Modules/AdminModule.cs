@@ -119,7 +119,7 @@ namespace RepBot.Modules
         {
             var ping = (Context.Message.Timestamp.UtcDateTime - DateTimeOffset.UtcNow.UtcDateTime).TotalMilliseconds + " ms";
 
-            await ReplyAsync($"Pong3! -> :stopwatch: Message response latency: {ping} -> Discord api latency: {Context.Client.Latency} ");
+            await ReplyAsync($"Pong4! -> :stopwatch: Message response latency: {ping} -> Discord api latency: {Context.Client.Latency} ");
         }
 
 
