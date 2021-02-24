@@ -119,13 +119,14 @@ namespace RepBot.Modules
         {
             var ping = (Context.Message.Timestamp.UtcDateTime - DateTimeOffset.UtcNow.UtcDateTime).TotalMilliseconds + " ms";
 
-            await ReplyAsync($"Pong! -> :stopwatch: Message response latency: {ping} -> Discord api latency: {Context.Client.Latency} ");
+            await ReplyAsync($"Pong1! -> :stopwatch: Message response latency: {ping} -> Discord api latency: {Context.Client.Latency} ");
         }
+
 
 
         [Command("=update")]
         public async Task Update()
-        { 
+        {
             var process = new Process()
             {
                 StartInfo = new ProcessStartInfo
@@ -142,6 +143,6 @@ namespace RepBot.Modules
             await ReplyAsync("Started update service6");
         }
 
- 
+
     }
 }
