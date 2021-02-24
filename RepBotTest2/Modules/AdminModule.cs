@@ -131,10 +131,10 @@ namespace RepBot.Modules
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "nohup",
-                    Arguments = "/updatebot.sh &",
-                    UseShellExecute = true,
-                    CreateNoWindow = true,
+                    FileName = "sudo",
+                    Arguments = "/updatebot.sh",
+                    // UseShellExecute = true,
+                    // CreateNoWindow = true,
                     ErrorDialog = false,
                 }
             };
